@@ -1,26 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+// Hooks came after React 16.8 version
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [techs, setTech] = useState([]);
+    const [newTech, setNewTech] = useState('');
+
+    const handleAdd = useCallback(() => {
+        setTech([...techs, newTech]);
+        setNewTech('');
+    }, [newTech, techs]);
+
+    // replaced by useCallback hook
+    // function handleAdd() {
+    //     setTech([...techs, newTech]);
+    //     setNewTech('');
+    // }
+
+    useEffect(() => {
+        const storageTech = localStorage.getItem('tech');
+
+        if (storageTech) {
+            setTech(JSON.parse(storageTech));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('tech', JSON.stringify(techs));
+    }, [techs]);
+
+    const techSize = useMemo(() => techs.length, [techs]);
+
+    return (
+        <>
+            <ul>
+                {techs.map(tech => (
+                    <li key={tech}>{tech}</li>
+                ))}
+            </ul>
+            <strong>Você listou {techSize} tecnologias</strong>
+            <br />
+            <input
+                value={newTech}
+                onChange={event => setNewTech(event.target.value)}
+            />
+            <button type="button" onClick={handleAdd}>
+                Adicionar
+            </button>
+        </>
+    );
 }
 
 export default App;
